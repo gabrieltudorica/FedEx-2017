@@ -1,25 +1,29 @@
 ﻿using System.Linq;
 using NAudio.Wave;
 using ScottPlot;
+using System;
 
 namespace microphone
 {
-    public class RealtimeTransformationChart
+    public class RealtimeTransformation
     {
         public ScottPlotUC PulseModulationChart { get; private set; }
         public ScottPlotUC FastFourierTransformChart { get; private set; }
+        public int Frequency { get; private set; }
        
         private byte[] rawData;
         private int sampleRate;
         private int arraySize;
         private int[] plottableData;               
 
-        public RealtimeTransformationChart(byte[] rawData, int sampleRate)
+        public RealtimeTransformation(byte[] rawData, int sampleRate)
         {
             this.rawData = rawData;
             this.sampleRate = sampleRate;
             arraySize = ComputeArraySizeFor(rawData.Length);
+
             ComputeCharts();
+            LoadFrequencyData();
         }        
 
         private int ComputeArraySizeFor(int rawDataLength)
@@ -82,13 +86,22 @@ namespace microphone
             }
 
             var fft = new FastFourierTransform(PulseModulationChart.Ys);
-            yAxisValues = fft.Get();
+            yAxisValues = fft.Get();           
 
             FastFourierTransformChart = new ScottPlotUC
             {
                 Xs = xAxisValues.Take(xAxisValues.Length / 2).ToArray(),
                 Ys = yAxisValues.Take(yAxisValues.Length / 2).ToArray()
             };
+        }
+
+        private void LoadFrequencyData()
+        {
+            var amplitudes = FastFourierTransformChart.Ys.ToList();
+            int dominantAmplitudeIndex = amplitudes.IndexOf(amplitudes.Max());
+            double dominantFrequencyInKhz = FastFourierTransformChart.Xs[dominantAmplitudeIndex];
+
+            Frequency = Convert.ToInt32(dominantFrequencyInKhz * 1000);
         }
     }
 }

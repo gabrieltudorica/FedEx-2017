@@ -28,15 +28,16 @@ namespace microphone
             
             timer1.Enabled = false;
 
-            var realtimeTransformationChart = new RealtimeTransformationChart(capturedData, soundCardSampleRate);
-            pulseCodeModulationChart.Xs = realtimeTransformationChart.PulseModulationChart.Xs;
-            pulseCodeModulationChart.Ys = realtimeTransformationChart.PulseModulationChart.Ys;
+            var realtimeTransformation = new RealtimeTransformation(capturedData, soundCardSampleRate);
+            pulseCodeModulationChart.Xs = realtimeTransformation.PulseModulationChart.Xs;
+            pulseCodeModulationChart.Ys = realtimeTransformation.PulseModulationChart.Ys;
             pulseCodeModulationChart.UpdateGraph();
 
-            fastFourierTransformationChart.Xs = realtimeTransformationChart.FastFourierTransformChart.Xs;
-            fastFourierTransformationChart.Ys = realtimeTransformationChart.FastFourierTransformChart.Ys;
+            fastFourierTransformationChart.Xs = realtimeTransformation.FastFourierTransformChart.Xs;
+            fastFourierTransformationChart.Ys = realtimeTransformation.FastFourierTransformChart.Ys;
             fastFourierTransformationChart.UpdateGraph();
-            
+
+            frequencyLbl.Text = string.Format("Frequency: {0} Hz", realtimeTransformation.Frequency);
             timer1.Enabled = true;
         }      
 
