@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-
-using NAudio.Wave; // installed with nuget
-using NAudio.CoreAudioApi;
+using NAudio.Wave;
 using System.Numerics;
 
 
@@ -17,14 +9,11 @@ namespace microphone
 {
     public partial class Form1 : Form
     {
-
         public WaveIn wi;
-        public BufferedWaveProvider bwp;
-        public Int32 envelopeMax;
+        public BufferedWaveProvider bufferProvider;
 
-        private int RATE = 44100; // sample rate of the sound card
-        private int BUFFERSIZE = (int) Math.Pow(2,13); // must be a multiple of 2
-        //private int BUFFERSIZE = 2048; // must be a multiple of 2
+        private int soundCardSampleRate = 44100;
+        private int fftBuffer = (int) Math.Pow(2,13); // must be a multiple of 2
 
         public Form1()
         {
@@ -35,32 +24,32 @@ namespace microphone
             Console.Out.WriteLine("Device Count: {0}.", devcount);
 
             // get the WaveIn class started
-            WaveIn wi = new WaveIn();
-            wi.DeviceNumber = 0;
-            wi.WaveFormat = new NAudio.Wave.WaveFormat(RATE, 1);
+            WaveIn recorder = new WaveIn();
+            recorder.DeviceNumber = 0;
+            recorder.WaveFormat = new NAudio.Wave.WaveFormat(soundCardSampleRate, 1);
 
             // create a wave buffer and start the recording
-            wi.DataAvailable += new EventHandler<WaveInEventArgs>(wi_DataAvailable);
-            bwp = new BufferedWaveProvider(wi.WaveFormat);
-            bwp.BufferLength = BUFFERSIZE * 2;
+            recorder.DataAvailable += new EventHandler<WaveInEventArgs>(recorder_DataAvailable);
+            bufferProvider = new BufferedWaveProvider(recorder.WaveFormat);
+            bufferProvider.BufferLength = fftBuffer * 2;
 
-            bwp.DiscardOnBufferOverflow = true;
-            wi.StartRecording();
+            bufferProvider.DiscardOnBufferOverflow = true;
+            recorder.StartRecording();
 
         }
 
         // adds data to the audio recording buffer
-        void wi_DataAvailable(object sender, WaveInEventArgs e)
+        void recorder_DataAvailable(object sender, WaveInEventArgs e)
         {
-            bwp.AddSamples(e.Buffer, 0, e.BytesRecorded);
+            bufferProvider.AddSamples(e.Buffer, 0, e.BytesRecorded);
         }
 
         public void UpdateAudioGraph()
         {
             // read the bytes from the stream
-            int frameSize = BUFFERSIZE;
+            int frameSize = fftBuffer;
             var frames = new byte[frameSize];
-            bwp.Read(frames, 0, frameSize);
+            bufferProvider.Read(frames, 0, frameSize);
             if (frames.Length == 0) return;
             if (frames[frameSize-2] == 0) return;
             
@@ -82,7 +71,7 @@ namespace microphone
                 vals[i] = (int)(short)((hByte << 8) | lByte);
                 Xs[i] = i;
                 Ys[i] = vals[i];
-                Xs2[i] = (double)i/Ys.Length*RATE/1000.0; // units are in kHz
+                Xs2[i] = (double)i/Ys.Length*soundCardSampleRate/1000.0; // units are in kHz
             }
 
             // update scottplot (PCM, time domain)
