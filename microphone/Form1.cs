@@ -37,7 +37,7 @@ namespace microphone
             fastFourierTransformationChart.Ys = realtimeTransformation.FastFourierTransformChart.Ys;
             fastFourierTransformationChart.UpdateGraph();
 
-            frequencyLbl.Text = string.Format("Frequency: {0} Hz", realtimeTransformation.Frequency);
+            frequencyLbl.Text = string.Format("Frequency: {0} Hz", realtimeTransformation.Frequency.ToString("#.##"));
             timer1.Enabled = true;
         }      
 

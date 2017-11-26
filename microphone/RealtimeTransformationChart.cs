@@ -9,7 +9,7 @@ namespace microphone
     {
         public ScottPlotUC PulseModulationChart { get; private set; }
         public ScottPlotUC FastFourierTransformChart { get; private set; }
-        public int Frequency { get; private set; }
+        public double Frequency { get; private set; }
        
         private byte[] rawData;
         private int sampleRate;
@@ -101,7 +101,7 @@ namespace microphone
             int dominantAmplitudeIndex = amplitudes.IndexOf(amplitudes.Max());
             double dominantFrequencyInKhz = FastFourierTransformChart.Xs[dominantAmplitudeIndex];
 
-            Frequency = Convert.ToInt32(dominantFrequencyInKhz * 1000);
+            Frequency = dominantFrequencyInKhz * 1000;
         }
     }
 }

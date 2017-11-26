@@ -54,7 +54,7 @@
             // 
             // captureBtn
             // 
-            this.captureBtn.Location = new System.Drawing.Point(978, 33);
+            this.captureBtn.Location = new System.Drawing.Point(945, 33);
             this.captureBtn.Margin = new System.Windows.Forms.Padding(2);
             this.captureBtn.Name = "captureBtn";
             this.captureBtn.Size = new System.Drawing.Size(100, 40);
@@ -72,11 +72,11 @@
             // 
             this.frequencyLbl.AutoSize = true;
             this.frequencyLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.frequencyLbl.Location = new System.Drawing.Point(916, 102);
+            this.frequencyLbl.Location = new System.Drawing.Point(856, 101);
             this.frequencyLbl.Name = "frequencyLbl";
-            this.frequencyLbl.Size = new System.Drawing.Size(219, 26);
+            this.frequencyLbl.Size = new System.Drawing.Size(166, 26);
             this.frequencyLbl.TabIndex = 7;
-            this.frequencyLbl.Text = "Frequency: 12456 Hz";
+            this.frequencyLbl.Text = "Frequency: - Hz";
             // 
             // Form1
             // 
