@@ -112,15 +112,138 @@ namespace microphone
                 { 262, "C" },
             };
 
-            int[] aStringFrequencies = new int[] { 110, 117, 123, 131, 139, 147, 156, 165, 175, 185, 196, 208, 220, 233, 247, 262, 277, 294, 311, 330, 349 };
-            int[] dStringFrequencies = new int[] { 147, 156, 165, 175, 185, 196, 208, 220, 233, 247, 262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466 };
-            int[] gStringFrequencies = new int[] { 196, 208, 220, 233, 247, 262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494, 523, 554, 587, 622 };
-            int[] bStringFrequencies = new int[] { 247, 262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494, 523, 554, 587, 622, 659, 698, 740, 784 };
-            int[] highEStringFrequencies = new int[] { 330, 349, 370, 392, 415, 440, 466, 494, 523, 554, 587, 622, 659, 698, 740, 784, 831, 880, 932, 988, 1047 };
+            Dictionary<int, string> aStringFrequencies = new Dictionary<int, string>
+            {
+                { 110, "A" },
+                { 117, "A#" },
+                { 123, "B" },
+                { 131, "C" },
+                { 139, "C#" },
+                { 147, "D" },
+                { 156, "D#" },
+                { 165, "E" },
+                { 175, "F" },
+                { 185, "F#" },
+                { 196, "G" },
+                { 208, "G#" },
+                { 220, "A" },
+                { 233, "A#" },
+                { 247, "B" },
+                { 262, "C" },
+                { 277, "C#" },
+                { 294, "D" },
+                { 311, "D#" },
+                { 330, "E" },
+                { 349, "F" },
+            };
 
+            Dictionary<int, string> dStringFrequencies = new Dictionary<int, string>
+            {
+                { 147, "D" },
+                { 156, "D#" },
+                { 165, "E" },
+                { 175, "F" },
+                { 185, "F#" },
+                { 196, "G" },
+                { 208, "G#" },
+                { 220, "A" },
+                { 233, "A#" },
+                { 247, "B" },
+                { 262, "C" },
+                { 277, "C#" },
+                { 294, "D" },
+                { 311, "D#" },
+                { 330, "E" },
+                { 349, "F" },
+                { 370, "F#" },
+                { 392, "G" },
+                { 415, "G#" },
+                { 440, "A" },
+                { 466, "A#" },
+            };
+
+            Dictionary<int, string> gStringFrequencies = new Dictionary<int, string>
+            {
+                { 196, "G" },
+                { 208, "G#" },
+                { 220, "A" },
+                { 233, "A#" },
+                { 247, "B" },
+                { 262, "C" },
+                { 277, "C#" },
+                { 294, "D" },
+                { 311, "D#" },
+                { 330, "E" },
+                { 349, "F" },
+                { 370, "F#" },
+                { 392, "G" },
+                { 415, "G#" },
+                { 440, "A" },
+                { 466, "A#" },
+                { 494, "B" },
+                { 523, "C" },
+                { 554, "C#" },
+                { 587, "D" },
+                { 622, "D#" },
+            };
+
+            Dictionary<int, string> bStringFrequencies = new Dictionary<int, string>
+            {
+                { 247, "B" },
+                { 262, "C" },
+                { 277, "C#" },
+                { 294, "D" },
+                { 311, "D#" },
+                { 330, "E" },
+                { 349, "F" },
+                { 370, "F#" },
+                { 392, "G" },
+                { 415, "G#" },
+                { 440, "A" },
+                { 466, "A#" },
+                { 494, "B" },
+                { 523, "C" },
+                { 554, "C#" },
+                { 587, "D" },
+                { 622, "D#" },
+                { 659, "E" },
+                { 698, "F" },
+                { 740, "F#" },
+                { 784, "G" },
+            };
+
+            Dictionary<int, string> highEStringFrequencies = new Dictionary<int, string>
+            {
+                { 330, "E" },
+                { 349, "F" },
+                { 370, "F#" },
+                { 392, "G" },
+                { 415, "G#" },
+                { 440, "A" },
+                { 466, "A#" },
+                { 494, "B" },
+                { 523, "C" },
+                { 554, "C#" },
+                { 587, "D" },
+                { 622, "D#" },
+                { 659, "E" },
+                { 698, "F" },
+                { 740, "F#" },
+                { 784, "G" },
+                { 831, "G#" },
+                { 880, "A" },
+                { 932, "A#" },
+                { 988, "B" },
+                { 1047, "C" },
+            };            
 
             var frequencyNotesByString = new List<Dictionary<int, string>>();
             frequencyNotesByString.Add(lowEStringFrequencies);
+            frequencyNotesByString.Add(aStringFrequencies);
+            frequencyNotesByString.Add(dStringFrequencies);
+            frequencyNotesByString.Add(gStringFrequencies);
+            frequencyNotesByString.Add(bStringFrequencies);
+            frequencyNotesByString.Add(highEStringFrequencies);
 
             return frequencyNotesByString;
         }
