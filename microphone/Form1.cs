@@ -8,64 +8,41 @@ namespace microphone
 {
     public partial class Form1 : Form
     {
-        public BufferedWaveProvider bufferProvider;
-
         private int soundCardSampleRate = 44100;
-        private int fftBuffer = (int) Math.Pow(2,13); // must be a multiple of 2
+        private int fftBufferSize = (int)Math.Pow(2, 13); // must be a multiple of 2
+        private Recorder recorder;
 
         public Form1()
         {
             InitializeComponent();
+            int recordingDeviceIndex = 0;
+            int channelCount = 1;
 
-            // see what audio devices are available
-            int devcount = WaveIn.DeviceCount;
-            Console.Out.WriteLine("Device Count: {0}.", devcount);           
-
-            // get the WaveIn class started
-            WaveIn recorder = new WaveIn
-            {
-                DeviceNumber = 0,
-                WaveFormat = new WaveFormat(soundCardSampleRate, 1)
-            };          
-            recorder.DataAvailable += new EventHandler<WaveInEventArgs>(Recorder_DataAvailable);
-            bufferProvider = new BufferedWaveProvider(recorder.WaveFormat)
-            {
-                BufferLength = fftBuffer * 2,
-                DiscardOnBufferOverflow = true
-            };
-
-            recorder.StartRecording();
-        }
-
-        void Recorder_DataAvailable(object sender, WaveInEventArgs e)
-        {
-            bufferProvider.AddSamples(e.Buffer, 0, e.BytesRecorded);
+            recorder = new Recorder(recordingDeviceIndex, soundCardSampleRate, channelCount, fftBufferSize);
+            recorder.StartCapturing();            
         }
 
         public void UpdateAudioGraph()
         {
-            // read the bytes from the stream
-            int frameSize = fftBuffer;
-            var frames = new byte[frameSize];
-            bufferProvider.Read(frames, 0, frameSize);
-            if (frames.Length == 0) return;
-            if (frames[frameSize-2] == 0) return;
+            byte[] capturedData = recorder.GetCapturedData();
+            if (capturedData.Length == 0) return;
+            if (capturedData[fftBufferSize - 2] == 0) return;
             
             timer1.Enabled = false;
 
             // convert it to int32 manually (and a double for scottplot)
             int SAMPLE_RESOLUTION = 16;
             int BYTES_PER_POINT = SAMPLE_RESOLUTION / 8;
-            Int32[] vals = new Int32[frames.Length/BYTES_PER_POINT];
-            double[] Ys = new double[frames.Length / BYTES_PER_POINT];
-            double[] Xs = new double[frames.Length / BYTES_PER_POINT];
-            double[] Ys2 = new double[frames.Length / BYTES_PER_POINT];
-            double[] Xs2 = new double[frames.Length / BYTES_PER_POINT];
+            Int32[] vals = new Int32[capturedData.Length/BYTES_PER_POINT];
+            double[] Ys = new double[capturedData.Length / BYTES_PER_POINT];
+            double[] Xs = new double[capturedData.Length / BYTES_PER_POINT];
+            double[] Ys2 = new double[capturedData.Length / BYTES_PER_POINT];
+            double[] Xs2 = new double[capturedData.Length / BYTES_PER_POINT];
             for (int i=0; i<vals.Length; i++)
             {
                 // bit shift the byte buffer into the right variable format
-                byte hByte = frames[i * 2 + 1];
-                byte lByte = frames[i * 2 + 0];
+                byte hByte = capturedData[i * 2 + 1];
+                byte lByte = capturedData[i * 2 + 0];
                 vals[i] = (int)(short)((hByte << 8) | lByte);
                 Xs[i] = i;
                 Ys[i] = vals[i];
