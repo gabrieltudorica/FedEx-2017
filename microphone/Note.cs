@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace microphone
 {
@@ -26,9 +27,19 @@ namespace microphone
         private void FindName()
         {
             foreach (Dictionary<int, string> stringNotes in frequencyNotesByString)
-            {               
+            {
+                if (!IsFoundOnString(stringNotes))
+                {
+                    continue;                    
+                }
+
                 Name = GetClosestNoteIn(stringNotes);
             }           
+        }
+
+        private bool IsFoundOnString(Dictionary<int, string> stringNotes)
+        {
+            return frequency <= stringNotes.Keys.Last();
         }
 
         private string GetClosestNoteIn(Dictionary<int, string> stringNotes)
@@ -58,22 +69,6 @@ namespace microphone
             var noteFrequencies = new List<int>(stringNotes.Keys).ToArray();
 
             int index = Array.BinarySearch(noteFrequencies, frequency);
-            //if (index >= 0)
-            //{
-            //    if (index > 0)
-            //    {
-            //        int noteFrequency = noteFrequencies[index - 1];
-            //        previousLowerNote = new KeyValuePair<int, string>(noteFrequency, stringNotes[noteFrequency]);
-            //    }
-
-            //    if (index < noteFrequencies.Length - 1)
-            //    {
-            //        int noteFrequency = noteFrequencies[index + 1];
-            //        nextHigherNote = new KeyValuePair<int, string>(noteFrequency, stringNotes[noteFrequency]);
-            //    }
-
-            //    return;
-            //}
 
             index = ~index;
 
