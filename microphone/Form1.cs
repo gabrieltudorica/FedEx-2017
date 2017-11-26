@@ -2,14 +2,12 @@
 using System.Linq;
 using System.Windows.Forms;
 using NAudio.Wave;
-using System.Numerics;
 
 
 namespace microphone
 {
     public partial class Form1 : Form
     {
-        public WaveIn wi;
         public BufferedWaveProvider bufferProvider;
 
         private int soundCardSampleRate = 44100;
@@ -21,25 +19,25 @@ namespace microphone
 
             // see what audio devices are available
             int devcount = WaveIn.DeviceCount;
-            Console.Out.WriteLine("Device Count: {0}.", devcount);
+            Console.Out.WriteLine("Device Count: {0}.", devcount);           
 
             // get the WaveIn class started
-            WaveIn recorder = new WaveIn();
-            recorder.DeviceNumber = 0;
-            recorder.WaveFormat = new NAudio.Wave.WaveFormat(soundCardSampleRate, 1);
+            WaveIn recorder = new WaveIn
+            {
+                DeviceNumber = 0,
+                WaveFormat = new WaveFormat(soundCardSampleRate, 1)
+            };          
+            recorder.DataAvailable += new EventHandler<WaveInEventArgs>(Recorder_DataAvailable);
+            bufferProvider = new BufferedWaveProvider(recorder.WaveFormat)
+            {
+                BufferLength = fftBuffer * 2,
+                DiscardOnBufferOverflow = true
+            };
 
-            // create a wave buffer and start the recording
-            recorder.DataAvailable += new EventHandler<WaveInEventArgs>(recorder_DataAvailable);
-            bufferProvider = new BufferedWaveProvider(recorder.WaveFormat);
-            bufferProvider.BufferLength = fftBuffer * 2;
-
-            bufferProvider.DiscardOnBufferOverflow = true;
             recorder.StartRecording();
-
         }
 
-        // adds data to the audio recording buffer
-        void recorder_DataAvailable(object sender, WaveInEventArgs e)
+        void Recorder_DataAvailable(object sender, WaveInEventArgs e)
         {
             bufferProvider.AddSamples(e.Buffer, 0, e.BytesRecorded);
         }
@@ -79,7 +77,8 @@ namespace microphone
             scottPlotUC1.Ys = Ys;
 
             //update scottplot (FFT, frequency domain)
-            Ys2 = FFT(Ys);
+            var fft = new FastFourierTransform(Ys);
+            Ys2 = fft.Get();
             scottPlotUC2.Xs = Xs2.Take(Xs2.Length / 2).ToArray();
             scottPlotUC2.Ys = Ys2.Take(Ys2.Length / 2).ToArray();
             
@@ -93,25 +92,7 @@ namespace microphone
             
             timer1.Enabled = true;
 
-        }
-
-        public double[] FFT(double[] data)
-        {
-            double[] fft = new double[data.Length]; // this is where we will store the output (fft)
-            Complex[] fftComplex = new Complex[data.Length]; // the FFT function requires complex format
-            for (int i = 0; i < data.Length; i++)
-            {
-                fftComplex[i] = new Complex(data[i], 0.0); // make it complex format (imaginary = 0)
-            }
-            Accord.Math.FourierTransform.FFT(fftComplex, Accord.Math.FourierTransform.Direction.Forward);
-            for (int i = 0; i < data.Length; i++)
-            {
-                fft[i] = fftComplex[i].Magnitude; // back to double
-                //fft[i] = Math.Log10(fft[i]); // convert to dB
-            }
-            return fft;
-            //todo: this could be much faster by reusing variables
-        }
+        }       
 
         private void button1_Click(object sender, EventArgs e)
         {
