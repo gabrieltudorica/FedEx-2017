@@ -5,31 +5,60 @@ using System.Windows.Forms;
 namespace microphone
 {
     public partial class Note2FretUi : Form
-    {
+    {       
         private int soundCardSampleRate = 44100;
         private int fftBufferSize = (int)Math.Pow(2, 13); // must be a multiple of 2
         private Recorder recorder;
+        private RealtimeTransformation realtimeTransformation;
 
         public Note2FretUi()
         {
             InitializeComponent();
+
+            timer.Interval = 10;
+
             int recordingDeviceIndex = 0;
-            int channelCount = 1;
-            var note = new Note(143);
+            int channelCount = 1;            
             recorder = new Recorder(recordingDeviceIndex, soundCardSampleRate, channelCount, fftBufferSize);
             recorder.StartCapturing();            
-        }   
-             
-        public void UpdateCharts()
+        }
+
+        private void button1_Click(object sender, EventArgs e)
         {
-            byte[] capturedData = recorder.GetCapturedData();
+            UpdateUi();
+            timer.Enabled = true;
+        }
 
-            if (capturedData.Length == 0) return;
-            if (capturedData[fftBufferSize - 2] == 0) return;
-            
-            timer1.Enabled = false;
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            UpdateUi();
+        }
 
-            var realtimeTransformation = new RealtimeTransformation(capturedData, soundCardSampleRate);
+        public void UpdateUi()
+        {            
+            byte[] capturedData = recorder.GetCapturedData();            
+            if (IsEmpty(capturedData))
+            {
+                return;
+            }
+
+            timer.Enabled = false;
+
+            realtimeTransformation = new RealtimeTransformation(capturedData, soundCardSampleRate);
+            LoadGraphs(capturedData);
+            LoadNoteDetails();
+
+            timer.Enabled = true;
+        }
+
+        private bool IsEmpty(byte[] rawData)
+        {
+            return rawData.Length == 0 || rawData[fftBufferSize - 2] == 0;
+        }
+
+        private void LoadGraphs(byte[] rawData)
+        {
+            realtimeTransformation = new RealtimeTransformation(rawData, soundCardSampleRate);
             pulseCodeModulationChart.Xs = realtimeTransformation.PulseModulationChart.Xs;
             pulseCodeModulationChart.Ys = realtimeTransformation.PulseModulationChart.Ys;
             pulseCodeModulationChart.UpdateGraph();
@@ -37,23 +66,22 @@ namespace microphone
             fastFourierTransformationChart.Xs = realtimeTransformation.FastFourierTransformChart.Xs;
             fastFourierTransformationChart.Ys = realtimeTransformation.FastFourierTransformChart.Ys;
             fastFourierTransformationChart.UpdateGraph();
+        }
 
+        private void LoadNoteDetails()
+        {
             frequencyLbl.Text = string.Format("Frequency: {0} Hz", realtimeTransformation.Frequency.ToString("#.##"));
-
             var note = new Note(Convert.ToInt16(realtimeTransformation.Frequency));
-            
-            timer1.Enabled = true;
-        }      
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            UpdateCharts();
-            timer1.Enabled = true;
-        }
+            noteLbl.Text = string.Format("Note: {0} ({1} Hz)", note.Name, note.TargetFrequency);
 
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            UpdateCharts();
-        }
+            string positions = "Positions: ";
+            foreach (string position in note.Positions)
+            {
+                positions += Environment.NewLine + position;
+            }
+
+            positionsLbl.Text = positions;
+        }        
     }
 }
