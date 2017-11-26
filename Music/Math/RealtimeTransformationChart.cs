@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using NAudio.Wave;
 using ScottPlot;
-using System;
+using Music.Math;
 
-namespace microphone
+namespace Music
 {
     public class RealtimeTransformation
     {

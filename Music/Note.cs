@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace microphone
+namespace Music
 {
     public class Note
     {
@@ -41,6 +41,58 @@ namespace microphone
             }       
         }
 
+        private bool IsFoundOnString(Dictionary<int, string> stringNotes)
+        {
+            return frequency <= stringNotes.Keys.Last();
+        }
+
+        private void GetClosestNoteIn(Dictionary<int, string> stringNotes)
+        {
+            if (stringNotes.ContainsKey(frequency))
+            {
+                Name = stringNotes[frequency];
+                return;
+            }
+
+            FindNeighboringNotesFrom(stringNotes);
+
+            if (IsCloserToLowerNote())
+            {
+                TargetFrequency = previousLowerNote.Key;
+                Name = stringNotes[previousLowerNote.Key];
+                return;
+            }
+
+            TargetFrequency = nextHigherNote.Key;
+            Name = stringNotes[nextHigherNote.Key];
+        }        
+
+        private void FindNeighboringNotesFrom(Dictionary<int, string> stringNotes)
+        {
+            var noteFrequencies = new List<int>(stringNotes.Keys).ToArray();
+
+            int index = Array.BinarySearch(noteFrequencies, frequency);
+
+            index = ~index;
+
+            if (index > 0)
+            {
+                int noteFrequency = noteFrequencies[index - 1];
+                previousLowerNote = new KeyValuePair<int, string>(noteFrequency, stringNotes[noteFrequency]);
+            }
+
+            if (index < noteFrequencies.Length)
+            {
+                int noteFrequency = noteFrequencies[index];
+                nextHigherNote = new KeyValuePair<int, string>(noteFrequency, stringNotes[noteFrequency]);
+            }
+        }
+
+        private bool IsCloserToLowerNote()
+        {
+            return System.Math.Abs(frequency - previousLowerNote.Key) < System.Math.Abs(frequency - nextHigherNote.Key);
+        }
+
         private void FindPositions()
         {
             foreach (Dictionary<int, string> stringNotes in frequencyNotesByString)
@@ -69,59 +121,7 @@ namespace microphone
             }
 
             return string.Format("Open {0} string", stringName);
-        }
-
-        private bool IsFoundOnString(Dictionary<int, string> stringNotes)
-        {
-            return frequency <= stringNotes.Keys.Last();
-        }
-
-        private void GetClosestNoteIn(Dictionary<int, string> stringNotes)
-        {
-            if (stringNotes.ContainsKey(frequency))
-            {
-                Name = stringNotes[frequency];
-                return;
-            }
-
-            FindNeighboringNotesFrom(stringNotes);
-
-            if (IsCloserToLowerNote())
-            {
-                TargetFrequency = previousLowerNote.Key;
-                Name = stringNotes[previousLowerNote.Key];
-                return;
-            }
-
-            TargetFrequency = nextHigherNote.Key;
-            Name = stringNotes[nextHigherNote.Key];
-        }
-
-        private bool IsCloserToLowerNote()
-        {
-            return Math.Abs(frequency - previousLowerNote.Key) < Math.Abs(frequency - nextHigherNote.Key);
-        }
-
-        private void FindNeighboringNotesFrom(Dictionary<int, string> stringNotes)
-        {
-            var noteFrequencies = new List<int>(stringNotes.Keys).ToArray();
-
-            int index = Array.BinarySearch(noteFrequencies, frequency);
-
-            index = ~index;
-
-            if (index > 0)
-            {
-                int noteFrequency = noteFrequencies[index - 1];
-                previousLowerNote = new KeyValuePair<int, string>(noteFrequency, stringNotes[noteFrequency]);
-            }
-
-            if (index < noteFrequencies.Length)
-            {
-                int noteFrequency = noteFrequencies[index];
-                nextHigherNote = new KeyValuePair<int, string>(noteFrequency, stringNotes[noteFrequency]);
-            }
-        }
+        }        
 
         private List<Dictionary<int, string>> GetFrequencyNotesByString()
         {

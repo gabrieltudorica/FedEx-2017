@@ -1,6 +1,6 @@
 ﻿namespace microphone
 {
-    partial class Form1
+    partial class Note2FretUi
     {
         /// <summary>
         /// Required designer variable.

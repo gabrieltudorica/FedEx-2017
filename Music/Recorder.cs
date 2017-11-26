@@ -1,7 +1,7 @@
 ﻿using NAudio.Wave;
 using System;
 
-namespace microphone
+namespace Music
 {
     public class Recorder
     {

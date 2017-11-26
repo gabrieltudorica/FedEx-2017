@@ -1,6 +1,7 @@
-﻿using System.Numerics;
+﻿using Accord.Math;
+using System.Numerics;
 
-namespace microphone
+namespace Music.Math
 {
     public class FastFourierTransform
     {
@@ -14,7 +15,7 @@ namespace microphone
         public double[] Get()
         {            
             Complex[] fftComplex = ConvertToComplex();
-            Accord.Math.FourierTransform.FFT(fftComplex, Accord.Math.FourierTransform.Direction.Forward);
+            FourierTransform.FFT(fftComplex, FourierTransform.Direction.Forward);
             return ConvertToDouble(fftComplex);          
         }
 
