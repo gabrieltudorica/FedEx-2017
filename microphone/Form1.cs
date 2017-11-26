@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Windows.Forms;
 using NAudio.Wave;
-
+using ScottPlot;
 
 namespace microphone
 {
@@ -22,6 +22,31 @@ namespace microphone
             recorder.StartCapturing();            
         }
 
+        private int ComputeArraySizeFor(int rawDataLength)
+        {
+            // convert it to int32 manually (and a double for scottplot)
+            int sampleResolution = 16;
+            int bytesPerPoint = sampleResolution / 8;
+
+            return rawDataLength / bytesPerPoint;
+        }
+
+        private int[] GetPlottableDataFrom(byte[] rawData)
+        {           
+            int[] plottableData = new int[ComputeArraySizeFor(rawData.Length)];
+
+            for (int i = 0; i < plottableData.Length; i++)
+            {
+                // bit shift the byte buffer into the right variable format
+                byte hByte = rawData[i * 2 + 1];
+                byte lByte = rawData[i * 2 + 0];
+
+                plottableData[i] = (short)((hByte << 8) | lByte);               
+            }
+
+            return plottableData;
+        }
+
         public void UpdateAudioGraph()
         {
             byte[] capturedData = recorder.GetCapturedData();
@@ -30,46 +55,39 @@ namespace microphone
             
             timer1.Enabled = false;
 
-            // convert it to int32 manually (and a double for scottplot)
-            int SAMPLE_RESOLUTION = 16;
-            int BYTES_PER_POINT = SAMPLE_RESOLUTION / 8;
-            Int32[] vals = new Int32[capturedData.Length/BYTES_PER_POINT];
-            double[] Ys = new double[capturedData.Length / BYTES_PER_POINT];
-            double[] Xs = new double[capturedData.Length / BYTES_PER_POINT];
-            double[] Ys2 = new double[capturedData.Length / BYTES_PER_POINT];
-            double[] Xs2 = new double[capturedData.Length / BYTES_PER_POINT];
-            for (int i=0; i<vals.Length; i++)
+            int arraySize = ComputeArraySizeFor(capturedData.Length);
+
+            double[] pulseCodeModulationXAxis = new double[arraySize];
+            double[] pulseCodeModulationYAxis = new double[arraySize];
+                        
+            double[] fastFourierTransformXAxis = new double[arraySize];
+            double[] fastFourierTransformYAxis = new double[arraySize];
+
+            int[] plottableData = GetPlottableDataFrom(capturedData);
+            for (int i=0; i < plottableData.Length; i++)
             {
-                // bit shift the byte buffer into the right variable format
-                byte hByte = capturedData[i * 2 + 1];
-                byte lByte = capturedData[i * 2 + 0];
-                vals[i] = (int)(short)((hByte << 8) | lByte);
-                Xs[i] = i;
-                Ys[i] = vals[i];
-                Xs2[i] = (double)i/Ys.Length*soundCardSampleRate/1000.0; // units are in kHz
+                pulseCodeModulationXAxis[i] = i;
+                pulseCodeModulationYAxis[i] = plottableData[i];
+                fastFourierTransformXAxis[i] = (double)i/pulseCodeModulationYAxis.Length*soundCardSampleRate/1000.0; // units are in kHz
             }
 
-            // update scottplot (PCM, time domain)
-            scottPlotUC1.Xs = Xs;
-            scottPlotUC1.Ys = Ys;
+            var fft = new FastFourierTransform(pulseCodeModulationYAxis);
+            fastFourierTransformYAxis = fft.Get();
 
-            //update scottplot (FFT, frequency domain)
-            var fft = new FastFourierTransform(Ys);
-            Ys2 = fft.Get();
-            scottPlotUC2.Xs = Xs2.Take(Xs2.Length / 2).ToArray();
-            scottPlotUC2.Ys = Ys2.Take(Ys2.Length / 2).ToArray();
-            
+            UpdatePlot(pulseCodeModulationPlot, pulseCodeModulationXAxis, pulseCodeModulationYAxis);
+            UpdatePlot(fastFourierTransformationPlot, fastFourierTransformXAxis.Take(fastFourierTransformXAxis.Length / 2).ToArray(), fastFourierTransformYAxis.Take(fastFourierTransformYAxis.Length / 2).ToArray());
 
-            // update the displays
-            scottPlotUC1.UpdateGraph();
-            scottPlotUC2.UpdateGraph();
-
-            scottPlotUC1.Update();
-            scottPlotUC2.Update();
-            
             timer1.Enabled = true;
+        }
 
-        }       
+        private void UpdatePlot(ScottPlotUC plot, double[] xValues, double[] yValues)
+        {
+            plot.Xs = xValues;
+            plot.Ys = yValues;
+
+            plot.UpdateGraph();
+            plot.Update();
+        }
 
         private void button1_Click(object sender, EventArgs e)
         {

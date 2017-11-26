@@ -29,25 +29,25 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.scottPlotUC1 = new ScottPlot.ScottPlotUC();
-            this.scottPlotUC2 = new ScottPlot.ScottPlotUC();
+            this.pulseCodeModulationPlot = new ScottPlot.ScottPlotUC();
+            this.fastFourierTransformationPlot = new ScottPlot.ScottPlotUC();
             this.button1 = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // scottPlotUC1
             // 
-            this.scottPlotUC1.Location = new System.Drawing.Point(12, 12);
-            this.scottPlotUC1.Name = "scottPlotUC1";
-            this.scottPlotUC1.Size = new System.Drawing.Size(1108, 402);
-            this.scottPlotUC1.TabIndex = 4;
+            this.pulseCodeModulationPlot.Location = new System.Drawing.Point(12, 12);
+            this.pulseCodeModulationPlot.Name = "scottPlotUC1";
+            this.pulseCodeModulationPlot.Size = new System.Drawing.Size(1108, 402);
+            this.pulseCodeModulationPlot.TabIndex = 4;
             // 
             // scottPlotUC2
             // 
-            this.scottPlotUC2.Location = new System.Drawing.Point(12, 420);
-            this.scottPlotUC2.Name = "scottPlotUC2";
-            this.scottPlotUC2.Size = new System.Drawing.Size(1108, 384);
-            this.scottPlotUC2.TabIndex = 5;
+            this.fastFourierTransformationPlot.Location = new System.Drawing.Point(12, 420);
+            this.fastFourierTransformationPlot.Name = "scottPlotUC2";
+            this.fastFourierTransformationPlot.Size = new System.Drawing.Size(1108, 384);
+            this.fastFourierTransformationPlot.TabIndex = 5;
             // 
             // button1
             // 
@@ -70,8 +70,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1132, 816);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.scottPlotUC2);
-            this.Controls.Add(this.scottPlotUC1);
+            this.Controls.Add(this.fastFourierTransformationPlot);
+            this.Controls.Add(this.pulseCodeModulationPlot);
             this.Name = "Form1";
             this.Text = "Form1";
             this.ResumeLayout(false);
@@ -79,8 +79,8 @@
         }
 
         #endregion
-        private ScottPlot.ScottPlotUC scottPlotUC1;
-        private ScottPlot.ScottPlotUC scottPlotUC2;
+        private ScottPlot.ScottPlotUC pulseCodeModulationPlot;
+        private ScottPlot.ScottPlotUC fastFourierTransformationPlot;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Timer timer1;
     }
