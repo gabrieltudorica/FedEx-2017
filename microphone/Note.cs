@@ -8,6 +8,7 @@ namespace microphone
     {
         public string Name { get; private set; }
         public int TargetFrequency { get; private set; }
+        public List<string> Positions { get; private set; }
 
         private int frequency;
         private List<Dictionary<int, string>> frequencyNotesByString = new List<Dictionary<int, string>>();
@@ -16,12 +17,14 @@ namespace microphone
         
         public Note(int frequency)
         {
-            this.frequency = frequency;
             Name = "N/A";
             TargetFrequency = 0;
+            Positions = new List<string>();
 
+            this.frequency = frequency;           
             frequencyNotesByString = GetFrequencyNotesByString();
             FindName();
+            FindPositions();
         }
 
         private void FindName()
@@ -30,11 +33,42 @@ namespace microphone
             {
                 if (!IsFoundOnString(stringNotes))
                 {
-                    continue;                    
+                    continue;
                 }
 
-                Name = GetClosestNoteIn(stringNotes);
-            }           
+                GetClosestNoteIn(stringNotes);
+                return;
+            }       
+        }
+
+        private void FindPositions()
+        {
+            foreach (Dictionary<int, string> stringNotes in frequencyNotesByString)
+            {
+                if (!stringNotes.ContainsKey(TargetFrequency))
+                {
+                    continue;
+                }
+
+                Positions.Add(GetFretPosition(stringNotes));
+            }
+        }
+
+        private string GetFretPosition(Dictionary<int, string> stringNotes)
+        {            
+            var frequencyFrets = stringNotes.Keys.ToArray();
+            int fretNumber = Array.IndexOf(frequencyFrets, TargetFrequency);
+
+            string stringName = stringNotes[stringNotes.Keys.First()];
+         
+            if (fretNumber > 0)
+            {
+                return string.Format("{0} String, Fret {1}",
+                    stringName,
+                    fretNumber.ToString());                
+            }
+
+            return string.Format("Open {0} string", stringName);
         }
 
         private bool IsFoundOnString(Dictionary<int, string> stringNotes)
@@ -42,21 +76,25 @@ namespace microphone
             return frequency <= stringNotes.Keys.Last();
         }
 
-        private string GetClosestNoteIn(Dictionary<int, string> stringNotes)
+        private void GetClosestNoteIn(Dictionary<int, string> stringNotes)
         {
             if (stringNotes.ContainsKey(frequency))
             {
-                return stringNotes[frequency];
+                Name = stringNotes[frequency];
+                return;
             }
 
             FindNeighboringNotesFrom(stringNotes);
 
             if (IsCloserToLowerNote())
             {
-                return stringNotes[previousLowerNote.Key];
+                TargetFrequency = previousLowerNote.Key;
+                Name = stringNotes[previousLowerNote.Key];
+                return;
             }
 
-            return stringNotes[nextHigherNote.Key];
+            TargetFrequency = nextHigherNote.Key;
+            Name = stringNotes[nextHigherNote.Key];
         }
 
         private bool IsCloserToLowerNote()
@@ -235,17 +273,17 @@ namespace microphone
                 { 932, "A#" },
                 { 988, "B" },
                 { 1047, "C" },
-            };            
+            };
 
-            var frequencyNotesByString = new List<Dictionary<int, string>>();
-            frequencyNotesByString.Add(lowEStringFrequencies);
-            frequencyNotesByString.Add(aStringFrequencies);
-            frequencyNotesByString.Add(dStringFrequencies);
-            frequencyNotesByString.Add(gStringFrequencies);
-            frequencyNotesByString.Add(bStringFrequencies);
-            frequencyNotesByString.Add(highEStringFrequencies);
-
-            return frequencyNotesByString;
+            return new List<Dictionary<int, string>>
+            {
+                lowEStringFrequencies,
+                aStringFrequencies,
+                dStringFrequencies,
+                gStringFrequencies,
+                bStringFrequencies,
+                highEStringFrequencies
+            };
         }
     }
 }

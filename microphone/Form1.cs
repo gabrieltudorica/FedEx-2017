@@ -16,7 +16,7 @@ namespace microphone
             InitializeComponent();
             int recordingDeviceIndex = 0;
             int channelCount = 1;
-            var note = new Note(418);
+            var note = new Note(143);
             recorder = new Recorder(recordingDeviceIndex, soundCardSampleRate, channelCount, fftBufferSize);
             recorder.StartCapturing();            
         }   
