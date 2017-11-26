@@ -99,7 +99,6 @@ namespace microphone
             scottPlotUC1.UpdateGraph();
             scottPlotUC2.UpdateGraph();
 
-            Application.DoEvents();
             scottPlotUC1.Update();
             scottPlotUC2.Update();
             
