@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Windows.Forms;
 
 namespace microphone
@@ -14,10 +16,10 @@ namespace microphone
             InitializeComponent();
             int recordingDeviceIndex = 0;
             int channelCount = 1;
-
+            var note = new Note(263);
             recorder = new Recorder(recordingDeviceIndex, soundCardSampleRate, channelCount, fftBufferSize);
             recorder.StartCapturing();            
-        }
+        }   
              
         public void UpdateCharts()
         {
@@ -38,6 +40,9 @@ namespace microphone
             fastFourierTransformationChart.UpdateGraph();
 
             frequencyLbl.Text = string.Format("Frequency: {0} Hz", realtimeTransformation.Frequency.ToString("#.##"));
+
+            var note = new Note(Convert.ToInt16(realtimeTransformation.Frequency));
+            
             timer1.Enabled = true;
         }      
 
