@@ -73,6 +73,7 @@ namespace ScottPlot
             stopwatch.Stop();
             MessageUpdate();
             thinking = false;
+            Update();
         }
 
 

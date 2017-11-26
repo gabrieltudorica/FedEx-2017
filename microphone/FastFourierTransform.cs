@@ -2,7 +2,7 @@
 
 namespace microphone
 {
-    class FastFourierTransform
+    public class FastFourierTransform
     {
         private double[] data;
 
