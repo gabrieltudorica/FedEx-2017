@@ -1,4 +1,4 @@
-﻿namespace microphone
+﻿namespace UI
 {
     partial class Note2FretUi
     {

@@ -2,7 +2,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace microphone
+namespace UI
 {
     public partial class Note2FretUi : Form
     {       
